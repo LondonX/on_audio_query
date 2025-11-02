@@ -150,6 +150,8 @@ class OnAudioQueryPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
         Log.i(TAG, "Detached from engine")
         channel.setMethodCallHandler(null)
+        // Clear provider references when the engine detaches to avoid stale refs.
+        PluginProvider.clear()
     }
 
     override fun onAttachedToActivity(binding: ActivityPluginBinding) {
@@ -183,6 +185,8 @@ class OnAudioQueryPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
         }
 
         this.binding = null
+        // Clear provider references to avoid accessing stale activity/context/call/result
+        PluginProvider.clear()
         Log.i(TAG, "Removed all declared methods")
     }
 }

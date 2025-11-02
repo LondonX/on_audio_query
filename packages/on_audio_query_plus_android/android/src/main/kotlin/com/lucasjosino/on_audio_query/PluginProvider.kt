@@ -25,13 +25,14 @@ object PluginProvider {
     */
     var showDetailedLog: Boolean = false
 
-    private lateinit var context: WeakReference<Context>
+    // Renamed internal refs to avoid collision with accessor method names
+    private lateinit var contextRef: WeakReference<Context>
 
-    private lateinit var activity: WeakReference<Activity>
+    private lateinit var activityRef: WeakReference<Activity>
 
-    private lateinit var call: WeakReference<MethodCall>
+    private lateinit var callRef: WeakReference<MethodCall>
 
-    private lateinit var result: WeakReference<MethodChannel.Result>
+    private lateinit var resultRef: WeakReference<MethodChannel.Result>
 
     /**
      * Used to define the current [Activity] and [Context].
@@ -39,8 +40,8 @@ object PluginProvider {
      * Should be defined once.
      */
     fun set(activity: Activity) {
-        this.context = WeakReference(activity.applicationContext)
-        this.activity = WeakReference(activity)
+        this.contextRef = WeakReference(activity.applicationContext)
+        this.activityRef = WeakReference(activity)
     }
 
     /**
@@ -49,8 +50,8 @@ object PluginProvider {
      * Should be defined/redefined on every [MethodChannel.MethodCallHandler.onMethodCall] request.
      */
     fun setCurrentMethod(call: MethodCall, result: MethodChannel.Result) {
-        this.call = WeakReference(call)
-        this.result = WeakReference(result)
+        this.callRef = WeakReference(call)
+        this.resultRef = WeakReference(result)
     }
 
     /**
@@ -60,7 +61,7 @@ object PluginProvider {
      * @return [Context]
      */
     fun context(): Context {
-        return this.context.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
+        return this.contextRef.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
     }
 
     /**
@@ -70,7 +71,7 @@ object PluginProvider {
      * @return [Activity]
      */
     fun activity(): Activity {
-        return this.activity.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
+        return this.activityRef.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
     }
 
     /**
@@ -80,7 +81,7 @@ object PluginProvider {
      * @return [MethodCall]
      */
     fun call(): MethodCall {
-        return this.call.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
+        return this.callRef.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
     }
 
     /**
@@ -90,7 +91,40 @@ object PluginProvider {
      * @return [MethodChannel.Result]
      */
     fun result(): MethodChannel.Result {
-        return this.result.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
+        return this.resultRef.get() ?: throw UninitializedPluginProviderException(ERROR_MESSAGE)
+    }
+
+    /**
+     * Safe check helpers to avoid accessing lateinit properties when the plugin is not initialized.
+     */
+    fun hasContext(): Boolean = this::contextRef.isInitialized && this.contextRef.get() != null
+
+    fun hasActivity(): Boolean = this::activityRef.isInitialized && this.activityRef.get() != null
+
+    fun hasCall(): Boolean = this::callRef.isInitialized && this.callRef.get() != null
+
+    fun hasResult(): Boolean = this::resultRef.isInitialized && this.resultRef.get() != null
+
+    /**
+     * Try getters that return null instead of throwing when the provider wasn't initialized.
+     */
+    fun tryGetContext(): Context? = if (this::contextRef.isInitialized) this.contextRef.get() else null
+
+    fun tryGetActivity(): Activity? = if (this::activityRef.isInitialized) this.activityRef.get() else null
+
+    fun tryGetCall(): MethodCall? = if (this::callRef.isInitialized) this.callRef.get() else null
+
+    fun tryGetResult(): MethodChannel.Result? = if (this::resultRef.isInitialized) this.resultRef.get() else null
+
+    /**
+     * Clear referents inside the WeakReferences. This keeps the variables initialized but
+     * avoids holding onto stale Activity/Context/Method references after detach.
+     */
+    fun clear() {
+        if (this::contextRef.isInitialized) this.contextRef.clear()
+        if (this::activityRef.isInitialized) this.activityRef.clear()
+        if (this::callRef.isInitialized) this.callRef.clear()
+        if (this::resultRef.isInitialized) this.resultRef.clear()
     }
 
     class UninitializedPluginProviderException(msg: String) : Exception(msg)

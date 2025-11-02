@@ -15,7 +15,6 @@ class PermissionController : PermissionManagerInterface,
 
     companion object {
         private const val TAG: String = "PermissionController"
-
         private const val REQUEST_CODE: Int = 88560
     }
 
@@ -35,10 +34,14 @@ class PermissionController : PermissionManagerInterface,
         }
 
     override fun permissionStatus(): Boolean = permissions.all {
-        // After "leaving" this class, context will be null so, we need this context argument to
-        // call the [checkSelfPermission].
+        val ctx = PluginProvider.tryGetContext()
+        if (ctx == null) {
+            Log.w(TAG, "Context not available while checking permission status")
+            return false
+        }
+
         ContextCompat.checkSelfPermission(
-            PluginProvider.context(),
+            ctx,
             it
         ) == PackageManager.PERMISSION_GRANTED
     }
@@ -46,13 +49,20 @@ class PermissionController : PermissionManagerInterface,
     override fun requestPermission() {
         Log.d(TAG, "Requesting permissions.")
         Log.d(TAG, "SDK: ${Build.VERSION.SDK_INT}, Should retry request: $retryRequest")
-        val activity = PluginProvider.activity()
+        val activity = PluginProvider.tryGetActivity()
+        if (activity == null) {
+            Log.w(TAG, "Activity not available to request permissions")
+            return
+        }
         ActivityCompat.requestPermissions(activity, permissions, REQUEST_CODE)
     }
 
-    // Second requestPermission, this one with the option "Never Ask Again".
     override fun retryRequestPermission() {
-        val activity = PluginProvider.activity()
+        val activity = PluginProvider.tryGetActivity()
+        if (activity == null) {
+            Log.w(TAG, "Activity not available to retry permission request")
+            return
+        }
         if (ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[0])
             || ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[1])
         ) {
@@ -67,27 +77,48 @@ class PermissionController : PermissionManagerInterface,
         permissions: Array<out String>,
         grantResults: IntArray
     ): Boolean {
-        // When the incoming request code doesn't match the request codes defined by the on_audio_query
-        // plugin return [false] to indicate the [on_audio_query] plugin is not handling the request
-        // result and Android should continue executing other registered handlers.
         if (REQUEST_CODE != requestCode) return false
 
-        // Check permission - ensure all permissions are granted
-        val isPermissionGranted = grantResults.isNotEmpty() && 
+        val isPermissionGranted = grantResults.isNotEmpty() &&
                 grantResults.all { it == PackageManager.PERMISSION_GRANTED }
 
         Log.d(TAG, "Permission accepted: $isPermissionGranted")
 
-        // After all checks, we can handle the permission request.
-        val result = PluginProvider.result()
+        // Guard PluginProvider calls - plugin may be uninitialized when result arrives.
+        try {
+            if (!PluginProvider.hasResult()) {
+                Log.w(TAG, "No plugin result available to deliver permission result to; ignoring.")
+                return false
+            }
+        } catch (e: PluginProvider.UninitializedPluginProviderException) {
+            Log.w(TAG, "PluginProvider not initialized while checking hasResult; ignoring.")
+            return false
+        } catch (e: Exception) {
+            Log.w(TAG, "Unexpected error while checking PluginProvider: ${e.message}")
+            return false
+        }
+
+        val result = try {
+            PluginProvider.tryGetResult()
+        } catch (e: PluginProvider.UninitializedPluginProviderException) {
+            Log.w(TAG, "PluginProvider not initialized while getting result; ignoring.")
+            null
+        } catch (e: Exception) {
+            Log.w(TAG, "Unexpected error while getting plugin result: ${e.message}")
+            null
+        }
+
+        if (result == null) {
+            Log.w(TAG, "Plugin result was null despite hasResult() indicating otherwise; ignoring.")
+            return false
+        }
+
         when {
             isPermissionGranted -> result.success(true)
             retryRequest -> retryRequestPermission()
             else -> result.success(false)
         }
 
-        // Return [true] here to indicate that the [on_audio_query] plugin handled the permission request
-        // result and Android should not continue executing other registered handlers.
         return true
     }
 }
