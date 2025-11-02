@@ -1,3 +1,13 @@
+
+## [[3.0.0](https://github.com/TalebRafiepour/on_audio_query_pluse/releases/tag/3.0.0)]
+
+### Fixes
+
+#### Android
+
+- **Fixed** permission result not returned to Flutter from Android.
+
+
 ## [[2.9.9](https://github.com/TalebRafiepour/on_audio_query_pluse/releases/tag/2.9.9)]
 
 ### Fixes
