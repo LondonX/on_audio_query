@@ -1,3 +1,12 @@
+## [[2.9.9](https://github.com/TalebRafiepour/on_audio_query_pluse/releases/tag/2.9.9)]
+
+### Fixes
+
+#### Android
+
+- **Fixed** grant permission issue on Android below API 33.
+- **Fixed** rename playlist functionality on Android.
+
 ## [[2.9.4](https://github.com/LucJosin/on_audio_query/releases/tag/2.9.4)]
 
 ### Fixes
