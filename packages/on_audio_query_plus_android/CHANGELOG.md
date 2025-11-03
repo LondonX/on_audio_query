@@ -1,3 +1,8 @@
+## 1.2.0
+
+**Bug Fixes:**
+- Fixed issue of removing song from playlist
+
 ## 1.1.9
 
 **Bug Fixes:**

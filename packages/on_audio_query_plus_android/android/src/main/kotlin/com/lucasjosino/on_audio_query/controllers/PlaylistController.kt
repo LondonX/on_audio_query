@@ -117,7 +117,6 @@ class PlaylistController {
         return false
     }
 
-    //TODO Add option to use a list
     fun removeFromPlaylist() {
         this.resolver = context.contentResolver
         val playlistId = call.argument<Int>("playlistId")!!
@@ -127,13 +126,13 @@ class PlaylistController {
         if (!checkPlaylistId(playlistId)) result.success(false)
         else {
             try {
-                val uri = MediaStore.Audio.Playlists.Members.getContentUri(
+                val membersUri = MediaStore.Audio.Playlists.Members.getContentUri(
                     "external",
                     playlistId.toLong()
                 )
                 // delete by AUDIO_ID so the audio (member) is removed from the playlist
                 val where = MediaStore.Audio.Playlists.Members.AUDIO_ID + "=?"
-                resolver.delete(uri, where, arrayOf(audioId.toString()))
+                resolver.delete(membersUri, where, arrayOf(audioId.toString()))
                 result.success(true)
             } catch (e: Exception) {
                 Log.i(channelError, e.toString())
