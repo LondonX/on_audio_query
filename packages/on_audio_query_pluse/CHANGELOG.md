@@ -1,6 +1,6 @@
 
 
-## [[3.0.1](https://github.com/TalebRafiepour/on_audio_query_pluse/releases/tag/3.0.1)]
+## [[3.0.2](https://github.com/TalebRafiepour/on_audio_query_pluse/releases/tag/3.0.1)]
 
 ### Fixes
 

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:on_audio_query_example/playlist_details_page.dart';
 import 'package:on_audio_query_pluse/on_audio_query.dart';
 
 class PlaylistPage extends StatefulWidget {
@@ -299,11 +300,11 @@ class _PlaylistPageState extends State<PlaylistPage> {
                         ),
                         onLongPress: () => _showPlaylistOptions(playlist),
                         onTap: () {
-                          // TODO: Navigate to playlist details page
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content:
-                                  Text('Opened playlist: ${playlist.playlist}'),
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  PlaylistDetailsPage(playlist: playlist),
                             ),
                           );
                         },
