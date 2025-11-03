@@ -1,3 +1,8 @@
+## 1.1.9
+
+**Bug Fixes:**
+- Fixed issue of inserting song to a playlist if it already exist
+
 ## 1.1.8
 
 **Bug Fixes:**

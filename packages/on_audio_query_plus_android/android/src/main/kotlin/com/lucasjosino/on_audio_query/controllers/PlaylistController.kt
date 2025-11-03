@@ -62,13 +62,10 @@ class PlaylistController {
         }
     }
 
-    //TODO Add option to use a list
-    //TODO Fix error on Android 10
     fun addToPlaylist() {
         this.resolver = context.contentResolver
         val playlistId = call.argument<Int>("playlistId")!!
         val audioId = call.argument<Int>("audioId")!!
-
 
         //Check if Playlist exists based in Id
         if (!checkPlaylistId(playlistId)) result.success(false)
@@ -76,6 +73,12 @@ class PlaylistController {
             try {
                 val membersUri =
                     MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId.toLong())
+
+                // Check if audio already exists in the playlist
+                if (checkAudioInPlaylist(playlistId, audioId)) {
+                    result.success(false)
+                    return
+                }
 
                 // compute play order: use max(play_order) + 1
                 var playOrder = 0
@@ -88,16 +91,30 @@ class PlaylistController {
 
                 contentValues.clear()
                 contentValues.put(MediaStore.Audio.Playlists.Members.PLAY_ORDER, playOrder + 1)
-                // AUDIO_ID is an integer column; put as Long or Int is acceptable
                 contentValues.put(MediaStore.Audio.Playlists.Members.AUDIO_ID, audioId)
-                //contentValues.put(MediaStore.Audio.AudioColumns._ID, audioId)
                 resolver.insert(membersUri, contentValues)
                 result.success(true)
             } catch (e: Exception) {
                 Log.i(channelError, e.toString())
                 result.success(false)
             }
+    }
+    }
+
+    // Helper function to check if audio already exists in playlist
+    private fun checkAudioInPlaylist(playlistId: Int, audioId: Int): Boolean {
+        val membersUri = MediaStore.Audio.Playlists.Members.getContentUri("external", playlistId.toLong())
+        val cursor = resolver.query(
+            membersUri,
+            arrayOf(MediaStore.Audio.Playlists.Members.AUDIO_ID),
+            "${MediaStore.Audio.Playlists.Members.AUDIO_ID}=?",
+            arrayOf(audioId.toString()),
+            null
+        )
+        cursor?.use {
+            return it.moveToFirst()
         }
+        return false
     }
 
     //TODO Add option to use a list

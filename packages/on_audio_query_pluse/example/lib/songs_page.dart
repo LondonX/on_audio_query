@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:on_audio_query_example/playlist_selection_bottom_sheet.dart';
 import 'package:on_audio_query_pluse/on_audio_query.dart';
 
 class SongsPage extends StatefulWidget {
@@ -81,9 +82,36 @@ class _SongsPageState extends State<SongsPage> {
                       return ListTile(
                         title: Text(item.data![index].title),
                         subtitle: Text(item.data![index].artist ?? "No Artist"),
-                        trailing: const Icon(Icons.arrow_forward_rounded),
-                        // This Widget will query/load image.
-                        // You can use/create your own widget/method using [queryArtwork].
+                        trailing: PopupMenuButton(
+                          itemBuilder: (context) {
+                            return [
+                              const PopupMenuItem(
+                                value: 'add_to_playlist',
+                                child: Text('Add to Playlist'),
+                              ),
+                            ];
+                          },
+                          onSelected: (value) {
+                            if (value == 'add_to_playlist') {
+                              PlaylistSelectionBottomSheet.show(context)
+                                  .then((playlist) async {
+                                if (playlist != null) {
+                                  final result =
+                                      await _audioQuery.addToPlaylist(
+                                    playlist.id,
+                                    item.data![index].id,
+                                  );
+                                  String message = result
+                                      ? 'Song added to ${playlist.playlist}'
+                                      : 'Failed to add song to ${playlist.playlist}';
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(message)),
+                                  );
+                                }
+                              });
+                            }
+                          },
+                        ),
                         leading: QueryArtworkWidget(
                           controller: _audioQuery,
                           id: item.data![index].id,
