@@ -13,6 +13,8 @@ Copyright: © 2021, Lucas Josino. All rights reserved.
 */
 
 import 'package:flutter/material.dart';
+import 'package:on_audio_query_example/albums_page.dart';
+import 'package:on_audio_query_example/artists_page.dart';
 import 'package:on_audio_query_example/playlist_page.dart';
 import 'package:on_audio_query_example/songs_page.dart';
 
@@ -30,7 +32,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 2,
+      length: 4,
       child: Scaffold(
         appBar: AppBar(
           title: const Text('Music Library'),
@@ -38,6 +40,8 @@ class HomePage extends StatelessWidget {
             tabs: [
               Tab(text: 'Songs', icon: Icon(Icons.music_note)),
               Tab(text: 'Playlists', icon: Icon(Icons.playlist_play)),
+              Tab(text: 'Albums', icon: Icon(Icons.album)),
+              Tab(text: 'Artists', icon: Icon(Icons.person)),
             ],
           ),
         ),
@@ -45,6 +49,8 @@ class HomePage extends StatelessWidget {
           children: [
             SongsPage(),
             PlaylistPage(),
+            AlbumsPage(),
+            ArtistsPage()
           ],
         ),
       ),

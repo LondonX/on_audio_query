@@ -2,10 +2,10 @@ package com.lucasjosino.on_audio_query.queries
 
 import android.content.ContentResolver
 import android.net.Uri
+import android.provider.MediaStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lucasjosino.on_audio_query.PluginProvider
-import com.lucasjosino.on_audio_query.controllers.PermissionController
 import com.lucasjosino.on_audio_query.queries.helper.QueryHelper
 import com.lucasjosino.on_audio_query.types.checkArtistsUriType
 import com.lucasjosino.on_audio_query.types.sorttypes.checkArtistSortType
@@ -84,8 +84,34 @@ class ArtistQuery : ViewModel() {
                 artistList.add(tempData)
             }
 
+            // Add song count for each artist
+            for (artist in artistList) {
+                val artistId = artist["_id"].toString()
+                val mediaCount = getSongCountForArtist(artistId, resolver)
+                artist["num_of_songs"] = mediaCount
+            }
+
             // Close cursor to avoid memory leaks.
             cursor?.close()
             return@withContext artistList
         }
+
+    // Get song count for a specific artist
+    private fun getSongCountForArtist(artistId: String, resolver: ContentResolver): Int {
+        return try {
+            val cursor = resolver.query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                null,
+                "${MediaStore.Audio.Media.ARTIST_ID} = ?",
+                arrayOf(artistId),
+                null
+            )
+            val count = cursor?.count ?: 0
+            cursor?.close()
+            count
+        } catch (e: Exception) {
+            Log.e(TAG, "Error getting song count for artist $artistId: ${e.message}")
+            0
+        }
+    }
 }
