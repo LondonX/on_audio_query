@@ -41,7 +41,7 @@ public class SwiftOnAudioQueryPlugin: NSObject, FlutterPlugin {
         // When adding the necessary [permissions] inside [Info.plist], [IOS] will automatically
         // request but, in any case, you can call this method.
         case Method.PERMISSION_REQUEST:
-            result(PermissionController.requestPermission())
+            PermissionController.requestPermission(result: result)
         // Some basic information about the platform, in this case, [IOS]
         //   * Model (Only return the "type", like: IPhone, MacOs, IPod..)
         //   * Version (IOS version)

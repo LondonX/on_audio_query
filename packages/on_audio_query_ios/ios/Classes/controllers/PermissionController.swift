@@ -10,16 +10,14 @@ class PermissionController {
         }
     }
     
-    public static func requestPermission() -> Bool {
+    public static func requestPermission(result: @escaping FlutterResult) -> Void {
         Log.type.debug("Requesting permissions.")
         Log.type.debug("iOS Version: \(ProcessInfo().operatingSystemVersion.majorVersion)")
         
-        var isPermissionGranted: Bool = false
         MPMediaLibrary.requestAuthorization { status in
-            isPermissionGranted = status == .authorized
+            let isPermissionGranted = status == .authorized
             Log.type.debug("Permission accepted: \(isPermissionGranted)")
+            result(isPermissionGranted)
         }
-        
-        return isPermissionGranted
     }
 }
