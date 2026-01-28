@@ -6,9 +6,8 @@
 name: on_audio_query_web
 description: The web implementation of [on_audio_query].
 version: 1.6.0
-homepage: https://github.com/LucJosin/on_audio_query/tree/main/packages/on_audio_query_web
-# pub.dev: https://pub.dev/packages/on_audio_query
-# pub.dev (Web): https://pub.dev/packages/on_audio_query_web
+
+publish_to: "none"
 
 environment:
   sdk: ">=2.17.0 <4.0.0"
@@ -16,7 +15,8 @@ environment:
 
 dependencies:
   # on_audio_query
-  on_audio_query_platform_interface: ^1.7.0
+  on_audio_query_platform_interface:
+    path: ../on_audio_query_platform_interface
 
   # Others
   path: ^1.8.0

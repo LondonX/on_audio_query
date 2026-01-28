@@ -1,7 +1,7 @@
 <div align=center>
 
 # on_audio_query
-[![Pub.dev](https://img.shields.io/pub/v/on_audio_query_pluse?color=9cf&label=Pub.dev&style=flat-square)](https://pub.dev/packages/on_audio_query_pluse)
+[![Pub.dev](https://img.shields.io/pub/v/on_audio_query_plus?color=9cf&label=Pub.dev&style=flat-square)](https://pub.dev/packages/on_audio_query_plus)
 [![Platforms](https://img.shields.io/badge/Platforms-Android%20%7C%20IOS%20%7C%20Web-9cf?&style=flat-square)]()
 [![Languages](https://img.shields.io/badge/Languages-Dart%20%7C%20Kotlin%20%7C%20Swift-9cf?&style=flat-square)]()
 
@@ -189,6 +189,6 @@ Or you can use a basic and custom Widget.
 
 ## LICENSE:
 
-* [LICENSE](https://github.com/TalebRafiepour/on_audio_query/blob/main/packages/on_audio_query_pluse/LICENSE)
+* [LICENSE](https://github.com/TalebRafiepour/on_audio_query/blob/main/packages/on_audio_query_plus/LICENSE)
 
 > * [Back to top](#on_audio_query)

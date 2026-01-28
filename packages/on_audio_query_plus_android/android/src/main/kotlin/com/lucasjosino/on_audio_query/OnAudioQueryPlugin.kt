@@ -131,7 +131,11 @@ class OnAudioQueryPlugin : FlutterPlugin, MethodCallHandler, ActivityAware {
                 val hasPermission = permissionController.permissionStatus()
                 Log.d(TAG, "Application has permissions: $hasPermission")
 
-                if (!hasPermission) {
+                // For artwork queries, allow execution even without full permissions
+                // The ArtworkQuery will handle the case when image permissions are missing
+                val isArtworkQuery = call.method == Method.QUERY_ARTWORK
+
+                if (!hasPermission && !isArtworkQuery) {
                     Log.w(TAG, "The application doesn't have access to the library")
                     result.error(
                         "MissingPermissions",

@@ -1,13 +1,16 @@
 package com.lucasjosino.on_audio_query.queries
 
+import android.Manifest
 import android.content.ContentResolver
 import android.content.ContentUris
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.os.Build
 import android.util.Size
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lucasjosino.on_audio_query.PluginProvider
@@ -96,6 +99,20 @@ class ArtworkQuery : ViewModel() {
 
     //Loading in Background
     private suspend fun loadArt(): ByteArray? = withContext(Dispatchers.IO) {
+        // Check if we have permission to access images
+        val context = PluginProvider.context()
+        val hasImagePermission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_MEDIA_IMAGES) == PackageManager.PERMISSION_GRANTED
+        } else {
+            ContextCompat.checkSelfPermission(context, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+        }
+
+        // If no image permission, return null (no artwork)
+        if (!hasImagePermission) {
+            Log.i(TAG, "No image permission available, returning null for artwork")
+            return@withContext null
+        }
+
         var artData: ByteArray? = null
 
         // If 'Android' >= 29/Q:

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:on_audio_query_example/playlist_selection_bottom_sheet.dart';
-import 'package:on_audio_query_pluse/on_audio_query.dart';
+import 'package:on_audio_query_plus/on_audio_query.dart';
 
 class SongsPage extends StatefulWidget {
   const SongsPage({Key? key}) : super(key: key);
